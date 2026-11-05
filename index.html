@@ -33,6 +33,34 @@
     min-height:100vh;
   }
   .wrap{max-width:920px;margin:0 auto;padding:24px 18px 80px}
+  /* ===== 锁屏 ===== */
+  #gate{
+    position:fixed;inset:0;z-index:999;
+    display:flex;align-items:center;justify-content:center;padding:20px;
+    background:
+      radial-gradient(circle at 20% 15%, rgba(30,122,88,.10), transparent 42%),
+      radial-gradient(circle at 80% 85%, rgba(30,122,88,.08), transparent 45%),
+      #F3F4F0;
+  }
+  #gate.hidden{display:none}
+  .lockcard{
+    background:var(--surface);border:1px solid var(--line);border-radius:18px;
+    box-shadow:0 20px 60px -30px rgba(32,36,42,.45);
+    padding:34px 26px;width:100%;max-width:400px;text-align:center;
+  }
+  .lockcard .logo{width:54px;height:54px;border-radius:14px;background:var(--accent);display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;color:#fff}
+  .lockcard h2{margin:0 0 6px;font-size:21px;letter-spacing:-.01em}
+  .lockcard .lsub{color:var(--muted);font-size:13px;margin:0 0 20px}
+  .lockcard input{
+    width:100%;padding:13px 14px;font-size:17px;letter-spacing:.08em;text-align:center;
+    border:1.5px solid var(--line-strong);border-radius:11px;font-family:Consolas,monospace;
+    outline:none;margin-bottom:14px;
+  }
+  .lockcard input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .lockcard .unlock{width:100%;background:var(--accent);color:#fff;border:0;border-radius:11px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+  .lockcard .unlock:hover{background:var(--accent-strong)}
+  .lockcard .err{color:var(--danger);font-size:13px;margin-top:12px;min-height:18px}
+  .lockcard .foot{color:var(--faint);font-size:12px;margin-top:16px}
   /* ===== 头部 ===== */
   header{padding:26px 0 20px}
   .kicker{
@@ -41,23 +69,13 @@
     margin:0 0 8px;
   }
   .kicker::before{content:"";width:18px;height:2px;background:var(--accent);border-radius:2px}
-  h1{
-    font-size:34px;line-height:1.12;margin:0;letter-spacing:-.02em;font-weight:800;
-    color:var(--ink);
-  }
+  h1{font-size:34px;line-height:1.12;margin:0;letter-spacing:-.02em;font-weight:800;color:var(--ink)}
   .sub{color:var(--muted);font-size:14px;line-height:1.6;margin:10px 0 0;max-width:60ch}
-
   /* ===== 拖拽区 ===== */
   .drop{
-    position:relative;
-    border:2px dashed var(--line-strong);
-    border-radius:var(--radius);
-    background:
-      radial-gradient(circle at 16px 16px, rgba(32,36,42,.05) 1px, transparent 1.5px) 0 0/28px 28px,
-      var(--surface);
-    padding:52px 20px;
-    text-align:center;
-    cursor:pointer;
+    position:relative;border:2px dashed var(--line-strong);border-radius:var(--radius);
+    background:radial-gradient(circle at 16px 16px, rgba(32,36,42,.05) 1px, transparent 1.5px) 0 0/28px 28px, var(--surface);
+    padding:52px 20px;text-align:center;cursor:pointer;
     transition:border-color .18s, background-color .18s, transform .12s;
   }
   .drop:hover{border-color:var(--accent);background-color:#FBFCF9}
@@ -66,14 +84,9 @@
   .drop .big b{color:var(--accent-strong)}
   .drop .hint{color:var(--faint);font-size:13px;margin-top:8px}
   .drop svg{width:44px;height:44px;margin-bottom:14px;color:var(--accent)}
-  .dropbtn{
-    display:inline-block;margin-top:18px;background:var(--accent);color:#fff;
-    border:0;border-radius:10px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;
-    font-family:inherit;transition:background .15s;
-  }
+  .dropbtn{display:inline-block;margin-top:18px;background:var(--accent);color:#fff;border:0;border-radius:10px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s}
   .dropbtn:hover{background:var(--accent-strong)}
   input[type=file]{display:none}
-
   /* ===== 控制条 ===== */
   .controls{
     display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;
@@ -88,40 +101,23 @@
   .ctl select{padding:7px 10px;border:1px solid var(--line-strong);border-radius:8px;font-size:14px;background:#fff;font-family:inherit;cursor:pointer}
   .ctl input[type=number]:focus,.ctl select:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
   .note{font-size:12px;color:var(--faint);margin:10px 2px 0}
-
   /* ===== 汇总 ===== */
-  .summary{
-    display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;
-    margin-top:20px;
-  }
+  .summary{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;margin-top:20px}
   .stats{display:flex;flex-wrap:wrap;gap:10px}
   .stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 16px;box-shadow:var(--shadow)}
   .stat .k{font-size:12px;color:var(--muted)}
   .stat .v{font-size:18px;font-weight:800;margin-top:2px;font-variant-numeric:tabular-nums}
   .stat .v.ok{color:var(--ok)}
   .actions{display:flex;gap:10px;flex-wrap:wrap}
-  .btn{
-    border:1px solid var(--line-strong);background:#fff;color:var(--ink);
-    border-radius:10px;padding:10px 18px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;
-    transition:border-color .15s,background .15s;
-  }
+  .btn{border:1px solid var(--line-strong);background:#fff;color:var(--ink);border-radius:10px;padding:10px 18px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:border-color .15s,background .15s}
   .btn:hover{border-color:var(--accent)}
   .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
   .btn.primary:hover{background:var(--accent-strong)}
   .btn:disabled{opacity:.5;cursor:not-allowed}
-
   /* ===== 列表 ===== */
   .list{margin-top:16px;display:flex;flex-direction:column;gap:10px}
   .empty{color:var(--faint);font-size:14px;text-align:center;padding:40px 0}
-  .card{
-    display:grid;
-    grid-template-columns:46px 1fr auto;
-    grid-template-areas:"thumb name act" "thumb meta act";
-    gap:2px 14px;
-    align-items:center;
-    background:var(--surface);border:1px solid var(--line);border-radius:12px;
-    padding:10px 14px;box-shadow:var(--shadow);
-  }
+  .card{display:grid;grid-template-columns:46px 1fr auto;grid-template-areas:"thumb name act" "thumb meta act";gap:2px 14px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px;box-shadow:var(--shadow)}
   .thumb{grid-area:thumb;width:46px;height:46px;border-radius:8px;object-fit:cover;background:#EEF0EC;border:1px solid var(--line)}
   .name{grid-area:name;font-size:14px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
   .meta{grid-area:meta;font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-variant-numeric:tabular-nums}
@@ -130,19 +126,12 @@
   .meta .busy{color:var(--faint);font-style:italic}
   .meta .bigger{color:var(--warn)}
   .act{grid-area:act;display:flex;gap:8px;align-items:center}
-  .iconbtn{
-    border:1px solid var(--line-strong);background:#fff;border-radius:8px;
-    width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
-    color:var(--muted);transition:color .15s,border-color .15s;font-family:inherit;
-  }
+  .iconbtn{border:1px solid var(--line-strong);background:#fff;border-radius:8px;width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);transition:color .15s,border-color .15s;font-family:inherit}
   .iconbtn:hover{color:var(--accent-strong);border-color:var(--accent)}
   .iconbtn svg{width:16px;height:16px}
   .iconbtn.dl:hover{color:#fff;background:var(--accent);border-color:var(--accent)}
-
-  /* ===== 底部 ===== */
   footer{margin-top:40px;color:var(--faint);font-size:12px;text-align:center;line-height:1.7}
   footer b{color:var(--muted)}
-
   @media (min-width:640px){
     .wrap{padding:34px 28px 90px}
     h1{font-size:44px}
@@ -153,6 +142,22 @@
 </style>
 </head>
 <body>
+
+<!-- ===== 锁屏 ===== -->
+<div id="gate">
+  <div class="lockcard" role="dialog" aria-label="卡密解锁">
+    <div class="logo" aria-hidden="true">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+    </div>
+    <h2>图片压缩工具</h2>
+    <p class="lsub">请输入卡密解锁使用</p>
+    <input id="keyInput" type="text" inputmode="latin" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="XXXX-XXXX-XXXX-XXXX">
+    <button class="unlock" id="unlockBtn">解锁</button>
+    <div class="err" id="keyErr"></div>
+    <div class="foot" id="keyHint">没有卡密请联系管理员</div>
+  </div>
+</div>
+
 <div class="wrap">
   <header>
     <p class="kicker">图片压缩工具</p>
@@ -220,6 +225,75 @@
 <script>
 (function(){
   "use strict";
+
+  /* ---- SHA-256（自包含，无外部依赖） ---- */
+  function sha256(ascii){
+    function rightRotate(v,a){return (v>>>a)|(v<<(32-a));}
+    var mp=Math.pow, mw=mp(2,32), i,j, result='', words=[];
+    var al=ascii.length*8, hash=sha256.h=sha256.h||[], k=sha256.k=sha256.k||[];
+    var pc=k.length, comp={};
+    for(var c=2;pc<64;c++){
+      if(!comp[c]){ for(i=0;i<313;i+=c) comp[i]=c; hash[pc]=(mp(c,.5)*mw)|0; k[pc++]=(mp(c,1/3)*mw)|0; }
+    }
+    ascii+='\x80';
+    while(ascii.length%64-56) ascii+='\x00';
+    for(i=0;i<ascii.length;i++){ j=ascii.charCodeAt(i); if(j>>8) return ''; words[i>>2]|=j<<((3-i)%4)*8; }
+    words[words.length]=((al/mw)|0); words[words.length]=(al);
+    for(j=0;j<words.length;){
+      var w=words.slice(j,j+=16), oldHash=hash, h=hash.slice(0,8);
+      for(i=0;i<64;i++){
+        var w15=w[i-15], w2=w[i-2], a=h[0], e=h[4];
+        var t1=h[7]+(rightRotate(e,6)^rightRotate(e,11)^rightRotate(e,25))+((e&h[5])^((~e)&h[6]))+k[i]
+          +(w[i]=(i<16)?w[i]:(w[i-16]+(rightRotate(w15,7)^rightRotate(w15,18)^(w15>>>3))+w[i-7]+(rightRotate(w2,17)^rightRotate(w2,19)^(w2>>>10)))|0);
+        var t2=(rightRotate(a,2)^rightRotate(a,13)^rightRotate(a,22))+((a&h[1])^(a&h[2])^(h[1]&h[2]));
+        h=[(t1+t2)|0].concat(h); h[4]=(h[4]+t1)|0;
+      }
+      for(i=0;i<8;i++) h[i]=(h[i]+oldHash[i])|0;
+      hash=h;
+    }
+    for(i=0;i<8;i++) for(j=3;j+1;j--){ var b=(hash[i]>>(j*8))&255; result+=((b<16)?0:'')+b.toString(16); }
+    return result;
+  }
+
+  /* ---- 卡密系统 ---- */
+  var gate=document.getElementById('gate');
+  var keyInput=document.getElementById('keyInput');
+  var unlockBtn=document.getElementById('unlockBtn');
+  var keyErr=document.getElementById('keyErr');
+  var STORE='xp_tool_unlocked';
+
+  function tryUnlock(){
+    var raw=keyInput.value.replace(/\s+/g,'').toUpperCase();
+    if(!raw){ keyErr.textContent='请输入卡密'; return; }
+    var h=sha256(raw);
+    keyErr.textContent='';
+    unlockBtn.disabled=true;
+    fetch('keys.json', {cache:'no-store'})
+      .then(function(r){ if(!r.ok) throw new Error('nokeys'); return r.json(); })
+      .then(function(list){
+        if(Array.isArray(list) && list.indexOf(h) !== -1){
+          try{ localStorage.setItem(STORE, h); }catch(e){}
+          unlock();
+        } else {
+          keyErr.textContent='卡密无效，请检查后重试';
+        }
+      })
+      .catch(function(){
+        keyErr.textContent='卡密服务暂时不可用，请稍后再试';
+      })
+      .finally(function(){ unlockBtn.disabled=false; });
+  }
+  function unlock(){ gate.classList.add('hidden'); }
+  function hasLocal(){
+    try{ return !!localStorage.getItem(STORE); }catch(e){ return false; }
+  }
+
+  unlockBtn.addEventListener('click', tryUnlock);
+  keyInput.addEventListener('keydown', function(e){ if(e.key==='Enter') tryUnlock(); });
+
+  if(hasLocal()){ unlock(); }
+
+  /* ================= 图片压缩工具 ================= */
   var els = {
     drop: document.getElementById('drop'),
     pickBtn: document.getElementById('pickBtn'),
@@ -236,7 +310,7 @@
     downloadAllBtn: document.getElementById('downloadAllBtn')
   };
 
-  var items = [];        // {id,file,name,ext,thumbUrl,orig,blob,size,status,format}
+  var items = [];
   var idSeq = 1;
   var debTimer = null;
 
@@ -246,38 +320,14 @@
     if(bytes < 1048576) return (bytes/1024).toFixed(1) + " KB";
     return (bytes/1048576).toFixed(2) + " MB";
   }
-  function extOf(name){
-    var m = /\.([a-zA-Z0-9]+)$/.exec(name);
-    return m ? m[1].toLowerCase() : '';
-  }
-  function isImage(t){
-    return t === 'image/jpeg' || t === 'image/png' || t === 'image/webp' || t === 'image/gif' || t === 'image/bmp';
-  }
-  function readFile(file){
-    return new Promise(function(res,rej){
-      var r = new FileReader();
-      r.onload = function(){ res(r.result); };
-      r.onerror = rej;
-      r.readAsDataURL(file);
-    });
-  }
-  function loadImage(src){
-    return new Promise(function(res,rej){
-      var img = new Image();
-      img.onload = function(){ res(img); };
-      img.onerror = rej;
-      img.src = src;
-    });
-  }
-  function toBlob(canvas, mime, q){
-    return new Promise(function(res,rej){
-      canvas.toBlob(function(b){ b ? res(b) : rej(new Error('compress fail')); }, mime, q);
-    });
-  }
-
+  function extOf(name){ var m=/\.([a-zA-Z0-9]+)$/.exec(name); return m?m[1].toLowerCase():''; }
+  function isImage(t){ return t==='image/jpeg'||t==='image/png'||t==='image/webp'||t==='image/gif'||t==='image/bmp'; }
+  function readFile(file){ return new Promise(function(res,rej){ var r=new FileReader(); r.onload=function(){res(r.result);}; r.onerror=rej; r.readAsDataURL(file); }); }
+  function loadImage(src){ return new Promise(function(res,rej){ var img=new Image(); img.onload=function(){res(img);}; img.onerror=rej; img.src=src; }); }
+  function toBlob(canvas,mime,q){ return new Promise(function(res,rej){ canvas.toBlob(function(b){ b?res(b):rej(new Error('compress fail')); },mime,q); }); }
   function targetFormat(item){
-    var f = els.format.value;
-    if(f !== 'original') return {mime:'image/'+f, ext:f};
+    var f=els.format.value;
+    if(f!=='original') return {mime:'image/'+f, ext:f};
     switch(item.ext){
       case 'png': return {mime:'image/png', ext:'png'};
       case 'webp': return {mime:'image/webp', ext:'webp'};
@@ -286,209 +336,105 @@
       default: return {mime:'image/jpeg', ext:'jpg'};
     }
   }
-
   function compress(item){
-    item.status = 'busy';
-    render();
-    var q = parseInt(els.quality.value,10)/100;
-    readFile(item.file).then(function(dataUrl){
-      return loadImage(dataUrl);
-    }).then(function(img){
-      var scale = 1;
-      var maxw = parseInt(els.maxw.value,10);
-      if(maxw && img.naturalWidth > maxw){ scale = maxw / img.naturalWidth; }
-      var w = Math.max(1, Math.round(img.naturalWidth * scale));
-      var h = Math.max(1, Math.round(img.naturalHeight * scale));
-      var canvas = document.createElement('canvas');
-      canvas.width = w; canvas.height = h;
-      var ctx = canvas.getContext('2d');
-      // 透明 PNG/WebP 转 JPG 时铺白底
-      var tf = targetFormat(item);
-      var isLossy = tf.mime === 'image/jpeg' || tf.mime === 'image/webp';
-      if(tf.mime === 'image/jpeg'){ ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0,0,w,h); }
-      ctx.drawImage(img, 0, 0, w, h);
-      var qVal = isLossy ? q : undefined;
-      return toBlob(canvas, tf.mime, qVal).then(function(blob){
-        item.blob = blob;
-        item.size = blob.size;
-        item.status = 'done';
-        item.outName = baseName(item.name) + '_压缩.' + tf.ext;
+    item.status='busy'; render();
+    var q=parseInt(els.quality.value,10)/100;
+    readFile(item.file).then(function(dataUrl){ return loadImage(dataUrl); }).then(function(img){
+      var scale=1, maxw=parseInt(els.maxw.value,10);
+      if(maxw && img.naturalWidth>maxw){ scale=maxw/img.naturalWidth; }
+      var w=Math.max(1,Math.round(img.naturalWidth*scale));
+      var h=Math.max(1,Math.round(img.naturalHeight*scale));
+      var canvas=document.createElement('canvas'); canvas.width=w; canvas.height=h;
+      var ctx=canvas.getContext('2d');
+      var tf=targetFormat(item);
+      var isLossy=(tf.mime==='image/jpeg'||tf.mime==='image/webp');
+      if(tf.mime==='image/jpeg'){ ctx.fillStyle='#FFFFFF'; ctx.fillRect(0,0,w,h); }
+      ctx.drawImage(img,0,0,w,h);
+      return toBlob(canvas,tf.mime,isLossy?q:undefined).then(function(blob){
+        item.blob=blob; item.size=blob.size; item.status='done';
+        item.outName=baseName(item.name)+'_压缩.'+tf.ext;
       });
-    }).catch(function(){
-      item.status = 'error';
-    }).then(function(){ render(); });
+    }).catch(function(){ item.status='error'; }).then(function(){ render(); });
   }
-
   function baseName(name){ return name.replace(/\.[^.]+$/,''); }
-
   function addFiles(files){
-    var added = 0;
-    Array.prototype.forEach.call(files, function(file){
-      if(!isImage(file.type) && !/\.(jpe?g|png|webp|gif|bmp)$/i.test(file.name)) return;
-      var item = {
-        id: idSeq++,
-        file: file,
-        name: file.name,
-        ext: extOf(file.name) || (file.type.split('/')[1] || ''),
-        thumbUrl: URL.createObjectURL(file),
-        orig: file.size,
-        blob: null,
-        size: null,
-        status: 'busy',
-        outName: ''
-      };
-      items.push(item);
-      added++;
+    var added=0;
+    Array.prototype.forEach.call(files,function(file){
+      if(!isImage(file.type)&&!/\.(jpe?g|png|webp|gif|bmp)$/i.test(file.name)) return;
+      var item={ id:idSeq++, file:file, name:file.name, ext:extOf(file.name)||(file.type.split('/')[1]||''), thumbUrl:URL.createObjectURL(file), orig:file.size, blob:null, size:null, status:'busy', outName:'' };
+      items.push(item); added++;
     });
-    if(added){ els.emptyTip.style.display = 'none'; }
-    render();
-    items.forEach(compress);
-    scheduleSummary();
+    if(added){ els.emptyTip.style.display='none'; }
+    render(); items.forEach(compress); scheduleSummary();
   }
-
-  function render(){
-    els.list.querySelectorAll('.card').forEach(function(n){ n.remove(); });
-    items.forEach(function(item){
-      els.list.appendChild(buildCard(item));
-    });
-    updateButtons();
-  }
-
+  function render(){ els.list.querySelectorAll('.card').forEach(function(n){n.remove();}); items.forEach(function(i){els.list.appendChild(buildCard(i));}); updateButtons(); }
   function buildCard(item){
-    var card = document.createElement('div');
-    card.className = 'card';
-    card.dataset.id = item.id;
-
-    var img = document.createElement('img');
-    img.className = 'thumb'; img.src = item.thumbUrl; img.alt = item.name;
-
-    var name = document.createElement('div');
-    name.className = 'name'; name.title = item.name; name.textContent = item.name;
-
-    var meta = document.createElement('div');
-    meta.className = 'meta';
-    if(item.status === 'busy'){
-      meta.innerHTML = '<span class="busy">压缩中…</span>';
-    } else if(item.status === 'error'){
-      meta.innerHTML = '<span class="bigger">处理失败</span>';
-    } else {
-      var save = ((item.orig - item.size) / item.orig * 100).toFixed(1);
-      var saveTxt, cls;
-      if(item.size < item.orig){ saveTxt = '节省 ' + save + '%'; cls = 'save'; }
-      else { saveTxt = '未能减小'; cls = 'bigger'; }
-      var span = document.createElement('span'); span.className = 'arr'; span.textContent = fmt(item.orig) + ' → ' + fmt(item.size);
-      var s = document.createElement('span'); s.className = cls; s.textContent = saveTxt;
+    var card=document.createElement('div'); card.className='card'; card.dataset.id=item.id;
+    var img=document.createElement('img'); img.className='thumb'; img.src=item.thumbUrl; img.alt=item.name;
+    var name=document.createElement('div'); name.className='name'; name.title=item.name; name.textContent=item.name;
+    var meta=document.createElement('div'); meta.className='meta';
+    if(item.status==='busy'){ meta.innerHTML='<span class="busy">压缩中…</span>'; }
+    else if(item.status==='error'){ meta.innerHTML='<span class="bigger">处理失败</span>'; }
+    else {
+      var save=((item.orig-item.size)/item.orig*100).toFixed(1), saveTxt, cls;
+      if(item.size<item.orig){ saveTxt='节省 '+save+'%'; cls='save'; } else { saveTxt='未能减小'; cls='bigger'; }
+      var span=document.createElement('span'); span.className='arr'; span.textContent=fmt(item.orig)+' → '+fmt(item.size);
+      var s=document.createElement('span'); s.className=cls; s.textContent=saveTxt;
       meta.appendChild(span); meta.appendChild(s);
     }
-
-    var act = document.createElement('div');
-    act.className = 'act';
-    if(item.status === 'done'){
-      var dl = document.createElement('button');
-      dl.className = 'iconbtn dl'; dl.title = '下载'; dl.setAttribute('aria-label','下载 '+item.name);
-      dl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 20h16"/></svg>';
-      dl.addEventListener('click', function(){ download(item); });
-      act.appendChild(dl);
+    var act=document.createElement('div'); act.className='act';
+    if(item.status==='done'){
+      var dl=document.createElement('button'); dl.className='iconbtn dl'; dl.title='下载'; dl.setAttribute('aria-label','下载 '+item.name);
+      dl.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 20h16"/></svg>';
+      dl.addEventListener('click',function(){ download(item); }); act.appendChild(dl);
     }
-    var rm = document.createElement('button');
-    rm.className = 'iconbtn'; rm.title = '移除'; rm.setAttribute('aria-label','移除 '+item.name);
-    rm.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
-    rm.addEventListener('click', function(){ removeItem(item.id); });
-    act.appendChild(rm);
-
+    var rm=document.createElement('button'); rm.className='iconbtn'; rm.title='移除'; rm.setAttribute('aria-label','移除 '+item.name);
+    rm.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+    rm.addEventListener('click',function(){ removeItem(item.id); }); act.appendChild(rm);
     card.appendChild(img); card.appendChild(name); card.appendChild(meta); card.appendChild(act);
     return card;
   }
-
   function download(item){
     if(!item.blob) return;
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(item.blob);
-    a.download = item.outName || (baseName(item.name) + '_压缩');
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 800);
+    var a=document.createElement('a'); a.href=URL.createObjectURL(item.blob); a.download=item.outName||(baseName(item.name)+'_压缩');
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },800);
   }
-
   function removeItem(id){
-    var idx = items.findIndex(function(i){ return i.id === id; });
-    if(idx > -1){ URL.revokeObjectURL(items[idx].thumbUrl); items.splice(idx,1); }
-    if(!items.length){ els.emptyTip.style.display = 'block'; }
+    var idx=items.findIndex(function(i){return i.id===id;});
+    if(idx>-1){ URL.revokeObjectURL(items[idx].thumbUrl); items.splice(idx,1); }
+    if(!items.length){ els.emptyTip.style.display='block'; }
     render(); scheduleSummary();
   }
-
-  function updateButtons(){
-    var any = items.some(function(i){ return i.status === 'done'; });
-    els.downloadAllBtn.disabled = !any;
-  }
-
-  function scheduleSummary(){
-    clearTimeout(debTimer);
-    debTimer = setTimeout(renderSummary, 200);
-  }
+  function updateButtons(){ els.downloadAllBtn.disabled=!items.some(function(i){return i.status==='done';}); }
+  function scheduleSummary(){ clearTimeout(debTimer); debTimer=setTimeout(renderSummary,200); }
   function renderSummary(){
-    if(!items.length){
-      els.stats.innerHTML = '<div class="stat"><div class="k">已添加图片</div><div class="v">0</div></div>';
-      return;
-    }
-    var done = items.filter(function(i){ return i.status === 'done'; });
-    var orig = done.reduce(function(a,i){ return a+i.orig; },0);
-    var comp = done.reduce(function(a,i){ return a+i.size; },0);
-    var save = orig>0 ? Math.round((orig-comp)/orig*100) : 0;
-    var html =
-      '<div class="stat"><div class="k">图片数量</div><div class="v">'+items.length+'</div></div>' +
-      '<div class="stat"><div class="k">原始体积</div><div class="v">'+fmt(orig)+'</div></div>' +
-      '<div class="stat"><div class="k">压缩后</div><div class="v">'+fmt(comp)+'</div></div>' +
+    if(!items.length){ els.stats.innerHTML='<div class="stat"><div class="k">已添加图片</div><div class="v">0</div></div>'; return; }
+    var done=items.filter(function(i){return i.status==='done';});
+    var orig=done.reduce(function(a,i){return a+i.orig;},0);
+    var comp=done.reduce(function(a,i){return a+i.size;},0);
+    var save=orig>0?Math.round((orig-comp)/orig*100):0;
+    els.stats.innerHTML='<div class="stat"><div class="k">图片数量</div><div class="v">'+items.length+'</div></div>'+
+      '<div class="stat"><div class="k">原始体积</div><div class="v">'+fmt(orig)+'</div></div>'+
+      '<div class="stat"><div class="k">压缩后</div><div class="v">'+fmt(comp)+'</div></div>'+
       '<div class="stat"><div class="k">节省空间</div><div class="v'+(save>0?' ok':'')+'">'+save+'%</div></div>';
-    els.stats.innerHTML = html;
   }
-
-  // 事件
-  els.drop.addEventListener('click', function(){ els.fileInput.click(); });
-  els.drop.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); els.fileInput.click(); } });
-  els.pickBtn.addEventListener('click', function(e){ e.stopPropagation(); els.fileInput.click(); });
-  els.fileInput.addEventListener('change', function(){ if(this.files.length) addFiles(this.files); this.value=''; });
-
-  ['dragenter','dragover'].forEach(function(ev){
-    document.addEventListener(ev, function(e){ e.preventDefault(); els.drop.classList.add('dragover'); });
-  });
-  ['dragleave','drop'].forEach(function(ev){
-    document.addEventListener(ev, function(e){ e.preventDefault(); els.drop.classList.remove('dragover'); });
-  });
-  document.addEventListener('drop', function(e){
-    if(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length){
-      addFiles(e.dataTransfer.files);
-    }
-  });
-
-  var reTimer = null;
-  function recompressAll(){
-    if(!items.length) return;
-    items.forEach(compress);
-    scheduleSummary();
-  }
-  function onSettings(){
-    els.qval.textContent = els.quality.value + '%';
-    clearTimeout(reTimer);
-    reTimer = setTimeout(recompressAll, 300);
-  }
-  els.quality.addEventListener('input', onSettings);
-  els.maxw.addEventListener('change', onSettings);
-  els.format.addEventListener('change', onSettings);
-
-  els.clearBtn.addEventListener('click', function(){
-    items.forEach(function(i){ URL.revokeObjectURL(i.thumbUrl); });
-    items = [];
-    els.emptyTip.style.display = 'block';
-    render(); renderSummary();
-  });
-  els.recompressBtn.addEventListener('click', recompressAll);
-  els.downloadAllBtn.addEventListener('click', function(){
-    items.filter(function(i){ return i.status==='done'; }).forEach(function(item, idx){
-      setTimeout(function(){ download(item); }, idx * 250);
-    });
-  });
-
+  els.drop.addEventListener('click',function(){ els.fileInput.click(); });
+  els.drop.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); els.fileInput.click(); } });
+  els.pickBtn.addEventListener('click',function(e){ e.stopPropagation(); els.fileInput.click(); });
+  els.fileInput.addEventListener('change',function(){ if(this.files.length) addFiles(this.files); this.value=''; });
+  ['dragenter','dragover'].forEach(function(ev){ document.addEventListener(ev,function(e){ e.preventDefault(); els.drop.classList.add('dragover'); }); });
+  ['dragleave','drop'].forEach(function(ev){ document.addEventListener(ev,function(e){ e.preventDefault(); els.drop.classList.remove('dragover'); }); });
+  document.addEventListener('drop',function(e){ if(e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files.length){ addFiles(e.dataTransfer.files); } });
+  var reTimer=null;
+  function recompressAll(){ if(!items.length) return; items.forEach(compress); scheduleSummary(); }
+  function onSettings(){ els.qval.textContent=els.quality.value+'%'; clearTimeout(reTimer); reTimer=setTimeout(recompressAll,300); }
+  els.quality.addEventListener('input',onSettings);
+  els.maxw.addEventListener('change',onSettings);
+  els.format.addEventListener('change',onSettings);
+  els.clearBtn.addEventListener('click',function(){ items.forEach(function(i){URL.revokeObjectURL(i.thumbUrl);}); items=[]; els.emptyTip.style.display='block'; render(); renderSummary(); });
+  els.recompressBtn.addEventListener('click',recompressAll);
+  els.downloadAllBtn.addEventListener('click',function(){ items.filter(function(i){return i.status==='done';}).forEach(function(item,idx){ setTimeout(function(){ download(item); },idx*250); }); });
   renderSummary();
 })();
 </script>
