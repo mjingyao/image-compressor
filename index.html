@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>图片压缩工具</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%231E7A58'/%3E%3Cpath d='M6 16V8h4l1.5 2H17v6H6z' fill='none' stroke='%23fff' stroke-width='1.6' stroke-linejoin='round'/%3E%3Cpath d='M9 12h6M12 9v6' stroke='%23fff' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#F3F4F0;
+    --surface:#FFFFFF;
+    --ink:#20242A;
+    --muted:#68707A;
+    --faint:#98A0AB;
+    --line:#DFE2DC;
+    --line-strong:#C8CCC4;
+    --accent:#1E7A58;
+    --accent-strong:#145C41;
+    --accent-soft:#E6F0EB;
+    --warn:#B45309;
+    --danger:#B3261E;
+    --ok:#1E7A58;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(32,36,42,.06),0 10px 30px -18px rgba(32,36,42,.25);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:24px 18px 80px}
+  /* ===== 头部 ===== */
+  header{padding:26px 0 20px}
+  .kicker{
+    display:flex;align-items:center;gap:8px;
+    font-size:13px;color:var(--accent-strong);font-weight:600;letter-spacing:.02em;
+    margin:0 0 8px;
+  }
+  .kicker::before{content:"";width:18px;height:2px;background:var(--accent);border-radius:2px}
+  h1{
+    font-size:34px;line-height:1.12;margin:0;letter-spacing:-.02em;font-weight:800;
+    color:var(--ink);
+  }
+  .sub{color:var(--muted);font-size:14px;line-height:1.6;margin:10px 0 0;max-width:60ch}
+
+  /* ===== 拖拽区 ===== */
+  .drop{
+    position:relative;
+    border:2px dashed var(--line-strong);
+    border-radius:var(--radius);
+    background:
+      radial-gradient(circle at 16px 16px, rgba(32,36,42,.05) 1px, transparent 1.5px) 0 0/28px 28px,
+      var(--surface);
+    padding:52px 20px;
+    text-align:center;
+    cursor:pointer;
+    transition:border-color .18s, background-color .18s, transform .12s;
+  }
+  .drop:hover{border-color:var(--accent);background-color:#FBFCF9}
+  .drop.dragover{border-color:var(--accent);background-color:var(--accent-soft);transform:scale(1.005)}
+  .drop .big{font-size:18px;font-weight:700;color:var(--ink);margin:0}
+  .drop .big b{color:var(--accent-strong)}
+  .drop .hint{color:var(--faint);font-size:13px;margin-top:8px}
+  .drop svg{width:44px;height:44px;margin-bottom:14px;color:var(--accent)}
+  .dropbtn{
+    display:inline-block;margin-top:18px;background:var(--accent);color:#fff;
+    border:0;border-radius:10px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;
+    font-family:inherit;transition:background .15s;
+  }
+  .dropbtn:hover{background:var(--accent-strong)}
+  input[type=file]{display:none}
+
+  /* ===== 控制条 ===== */
+  .controls{
+    display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:14px 18px;margin-top:16px;box-shadow:var(--shadow);
+  }
+  .ctl{display:flex;flex-direction:column;gap:6px;min-width:0}
+  .ctl label{font-size:12px;color:var(--muted);font-weight:600}
+  .ctl input[type=range]{width:180px;accent-color:var(--accent);cursor:pointer}
+  .ctl .qval{font-size:14px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+  .ctl input[type=number]{width:110px;padding:7px 10px;border:1px solid var(--line-strong);border-radius:8px;font-size:16px;font-family:inherit}
+  .ctl select{padding:7px 10px;border:1px solid var(--line-strong);border-radius:8px;font-size:14px;background:#fff;font-family:inherit;cursor:pointer}
+  .ctl input[type=number]:focus,.ctl select:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
+  .note{font-size:12px;color:var(--faint);margin:10px 2px 0}
+
+  /* ===== 汇总 ===== */
+  .summary{
+    display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;
+    margin-top:20px;
+  }
+  .stats{display:flex;flex-wrap:wrap;gap:10px}
+  .stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 16px;box-shadow:var(--shadow)}
+  .stat .k{font-size:12px;color:var(--muted)}
+  .stat .v{font-size:18px;font-weight:800;margin-top:2px;font-variant-numeric:tabular-nums}
+  .stat .v.ok{color:var(--ok)}
+  .actions{display:flex;gap:10px;flex-wrap:wrap}
+  .btn{
+    border:1px solid var(--line-strong);background:#fff;color:var(--ink);
+    border-radius:10px;padding:10px 18px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;
+    transition:border-color .15s,background .15s;
+  }
+  .btn:hover{border-color:var(--accent)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.primary:hover{background:var(--accent-strong)}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+
+  /* ===== 列表 ===== */
+  .list{margin-top:16px;display:flex;flex-direction:column;gap:10px}
+  .empty{color:var(--faint);font-size:14px;text-align:center;padding:40px 0}
+  .card{
+    display:grid;
+    grid-template-columns:46px 1fr auto;
+    grid-template-areas:"thumb name act" "thumb meta act";
+    gap:2px 14px;
+    align-items:center;
+    background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    padding:10px 14px;box-shadow:var(--shadow);
+  }
+  .thumb{grid-area:thumb;width:46px;height:46px;border-radius:8px;object-fit:cover;background:#EEF0EC;border:1px solid var(--line)}
+  .name{grid-area:name;font-size:14px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .meta{grid-area:meta;font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-variant-numeric:tabular-nums}
+  .meta .arr{color:var(--faint)}
+  .meta .save{color:var(--ok);font-weight:700}
+  .meta .busy{color:var(--faint);font-style:italic}
+  .meta .bigger{color:var(--warn)}
+  .act{grid-area:act;display:flex;gap:8px;align-items:center}
+  .iconbtn{
+    border:1px solid var(--line-strong);background:#fff;border-radius:8px;
+    width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
+    color:var(--muted);transition:color .15s,border-color .15s;font-family:inherit;
+  }
+  .iconbtn:hover{color:var(--accent-strong);border-color:var(--accent)}
+  .iconbtn svg{width:16px;height:16px}
+  .iconbtn.dl:hover{color:#fff;background:var(--accent);border-color:var(--accent)}
+
+  /* ===== 底部 ===== */
+  footer{margin-top:40px;color:var(--faint);font-size:12px;text-align:center;line-height:1.7}
+  footer b{color:var(--muted)}
+
+  @media (min-width:640px){
+    .wrap{padding:34px 28px 90px}
+    h1{font-size:44px}
+    .card{grid-template-columns:56px minmax(0,1fr) auto auto;grid-template-areas:"thumb name meta act";gap:0 16px}
+    .thumb{width:56px;height:56px}
+    .name{font-size:15px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="kicker">图片压缩工具</p>
+    <h1>把图片拖进来，体积立刻变小</h1>
+    <p class="sub">支持批量压缩 JPG / PNG / WebP。保持画质的前提下尽可能减小文件体积，适合发微信、传网页、存网盘。</p>
+  </header>
+
+  <div class="drop" id="drop" role="button" tabindex="0" aria-label="点击选择图片或把图片拖入">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="3" y="5" width="18" height="14" rx="2.5"/>
+      <circle cx="8.5" cy="10" r="1.4" fill="currentColor" stroke="none"/>
+      <path d="M4 17l5-5 3 3 3-3 5 5"/>
+      <path d="M12 9v3M10.5 10.5h3"/>
+    </svg>
+    <p class="big">把图片<b>直接拖到这里</b></p>
+    <p class="hint">或点击选择图片 · 可一次拖入多张</p>
+    <span class="dropbtn" id="pickBtn">选择图片</span>
+    <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp,image/gif,image/bmp" multiple>
+  </div>
+
+  <div class="controls">
+    <div class="ctl">
+      <label for="quality">压缩质量</label>
+      <div style="display:flex;align-items:center;gap:10px">
+        <input type="range" id="quality" min="30" max="95" step="1" value="80">
+        <span class="qval" id="qval">80%</span>
+      </div>
+    </div>
+    <div class="ctl">
+      <label for="maxw">最大宽度（像素，留空不缩放）</label>
+      <input type="number" id="maxw" min="100" max="8000" step="50" placeholder="例如 1920">
+    </div>
+    <div class="ctl">
+      <label for="format">输出格式</label>
+      <select id="format">
+        <option value="original">保持原格式</option>
+        <option value="jpeg">JPG（体积小）</option>
+        <option value="webp">WebP（体积最小）</option>
+        <option value="png">PNG（无损，透明）</option>
+      </select>
+    </div>
+  </div>
+  <p class="note">提示：质量滑块只对 JPG / WebP 生效；PNG 是无损格式，压缩效果有限，想大幅减体积请选 JPG 或 WebP。</p>
+
+  <div class="summary">
+    <div class="stats" id="stats"></div>
+    <div class="actions">
+      <button class="btn" id="clearBtn">清空</button>
+      <button class="btn primary" id="recompressBtn">重新压缩</button>
+      <button class="btn primary" id="downloadAllBtn" disabled>全部下载</button>
+    </div>
+  </div>
+
+  <div class="list" id="list">
+    <div class="empty" id="emptyTip">还没有图片，把图片拖进来开始吧</div>
+  </div>
+
+  <footer>
+    所有处理都在本机浏览器内完成，图片不会上传到任何服务器。<br>
+    生成的压缩图以“原名_压缩”命名，可逐张或一键下载。<br>
+    <b>新娘电竞厌制作</b>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var els = {
+    drop: document.getElementById('drop'),
+    pickBtn: document.getElementById('pickBtn'),
+    fileInput: document.getElementById('fileInput'),
+    quality: document.getElementById('quality'),
+    qval: document.getElementById('qval'),
+    maxw: document.getElementById('maxw'),
+    format: document.getElementById('format'),
+    list: document.getElementById('list'),
+    emptyTip: document.getElementById('emptyTip'),
+    stats: document.getElementById('stats'),
+    clearBtn: document.getElementById('clearBtn'),
+    recompressBtn: document.getElementById('recompressBtn'),
+    downloadAllBtn: document.getElementById('downloadAllBtn')
+  };
+
+  var items = [];        // {id,file,name,ext,thumbUrl,orig,blob,size,status,format}
+  var idSeq = 1;
+  var debTimer = null;
+
+  function fmt(bytes){
+    if(bytes == null || isNaN(bytes)) return "—";
+    if(bytes < 1024) return bytes + " B";
+    if(bytes < 1048576) return (bytes/1024).toFixed(1) + " KB";
+    return (bytes/1048576).toFixed(2) + " MB";
+  }
+  function extOf(name){
+    var m = /\.([a-zA-Z0-9]+)$/.exec(name);
+    return m ? m[1].toLowerCase() : '';
+  }
+  function isImage(t){
+    return t === 'image/jpeg' || t === 'image/png' || t === 'image/webp' || t === 'image/gif' || t === 'image/bmp';
+  }
+  function readFile(file){
+    return new Promise(function(res,rej){
+      var r = new FileReader();
+      r.onload = function(){ res(r.result); };
+      r.onerror = rej;
+      r.readAsDataURL(file);
+    });
+  }
+  function loadImage(src){
+    return new Promise(function(res,rej){
+      var img = new Image();
+      img.onload = function(){ res(img); };
+      img.onerror = rej;
+      img.src = src;
+    });
+  }
+  function toBlob(canvas, mime, q){
+    return new Promise(function(res,rej){
+      canvas.toBlob(function(b){ b ? res(b) : rej(new Error('compress fail')); }, mime, q);
+    });
+  }
+
+  function targetFormat(item){
+    var f = els.format.value;
+    if(f !== 'original') return {mime:'image/'+f, ext:f};
+    switch(item.ext){
+      case 'png': return {mime:'image/png', ext:'png'};
+      case 'webp': return {mime:'image/webp', ext:'webp'};
+      case 'gif': return {mime:'image/webp', ext:'webp'};
+      case 'bmp': return {mime:'image/jpeg', ext:'jpg'};
+      default: return {mime:'image/jpeg', ext:'jpg'};
+    }
+  }
+
+  function compress(item){
+    item.status = 'busy';
+    render();
+    var q = parseInt(els.quality.value,10)/100;
+    readFile(item.file).then(function(dataUrl){
+      return loadImage(dataUrl);
+    }).then(function(img){
+      var scale = 1;
+      var maxw = parseInt(els.maxw.value,10);
+      if(maxw && img.naturalWidth > maxw){ scale = maxw / img.naturalWidth; }
+      var w = Math.max(1, Math.round(img.naturalWidth * scale));
+      var h = Math.max(1, Math.round(img.naturalHeight * scale));
+      var canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      var ctx = canvas.getContext('2d');
+      // 透明 PNG/WebP 转 JPG 时铺白底
+      var tf = targetFormat(item);
+      var isLossy = tf.mime === 'image/jpeg' || tf.mime === 'image/webp';
+      if(tf.mime === 'image/jpeg'){ ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0,0,w,h); }
+      ctx.drawImage(img, 0, 0, w, h);
+      var qVal = isLossy ? q : undefined;
+      return toBlob(canvas, tf.mime, qVal).then(function(blob){
+        item.blob = blob;
+        item.size = blob.size;
+        item.status = 'done';
+        item.outName = baseName(item.name) + '_压缩.' + tf.ext;
+      });
+    }).catch(function(){
+      item.status = 'error';
+    }).then(function(){ render(); });
+  }
+
+  function baseName(name){ return name.replace(/\.[^.]+$/,''); }
+
+  function addFiles(files){
+    var added = 0;
+    Array.prototype.forEach.call(files, function(file){
+      if(!isImage(file.type) && !/\.(jpe?g|png|webp|gif|bmp)$/i.test(file.name)) return;
+      var item = {
+        id: idSeq++,
+        file: file,
+        name: file.name,
+        ext: extOf(file.name) || (file.type.split('/')[1] || ''),
+        thumbUrl: URL.createObjectURL(file),
+        orig: file.size,
+        blob: null,
+        size: null,
+        status: 'busy',
+        outName: ''
+      };
+      items.push(item);
+      added++;
+    });
+    if(added){ els.emptyTip.style.display = 'none'; }
+    render();
+    items.forEach(compress);
+    scheduleSummary();
+  }
+
+  function render(){
+    els.list.querySelectorAll('.card').forEach(function(n){ n.remove(); });
+    items.forEach(function(item){
+      els.list.appendChild(buildCard(item));
+    });
+    updateButtons();
+  }
+
+  function buildCard(item){
+    var card = document.createElement('div');
+    card.className = 'card';
+    card.dataset.id = item.id;
+
+    var img = document.createElement('img');
+    img.className = 'thumb'; img.src = item.thumbUrl; img.alt = item.name;
+
+    var name = document.createElement('div');
+    name.className = 'name'; name.title = item.name; name.textContent = item.name;
+
+    var meta = document.createElement('div');
+    meta.className = 'meta';
+    if(item.status === 'busy'){
+      meta.innerHTML = '<span class="busy">压缩中…</span>';
+    } else if(item.status === 'error'){
+      meta.innerHTML = '<span class="bigger">处理失败</span>';
+    } else {
+      var save = ((item.orig - item.size) / item.orig * 100).toFixed(1);
+      var saveTxt, cls;
+      if(item.size < item.orig){ saveTxt = '节省 ' + save + '%'; cls = 'save'; }
+      else { saveTxt = '未能减小'; cls = 'bigger'; }
+      var span = document.createElement('span'); span.className = 'arr'; span.textContent = fmt(item.orig) + ' → ' + fmt(item.size);
+      var s = document.createElement('span'); s.className = cls; s.textContent = saveTxt;
+      meta.appendChild(span); meta.appendChild(s);
+    }
+
+    var act = document.createElement('div');
+    act.className = 'act';
+    if(item.status === 'done'){
+      var dl = document.createElement('button');
+      dl.className = 'iconbtn dl'; dl.title = '下载'; dl.setAttribute('aria-label','下载 '+item.name);
+      dl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 20h16"/></svg>';
+      dl.addEventListener('click', function(){ download(item); });
+      act.appendChild(dl);
+    }
+    var rm = document.createElement('button');
+    rm.className = 'iconbtn'; rm.title = '移除'; rm.setAttribute('aria-label','移除 '+item.name);
+    rm.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+    rm.addEventListener('click', function(){ removeItem(item.id); });
+    act.appendChild(rm);
+
+    card.appendChild(img); card.appendChild(name); card.appendChild(meta); card.appendChild(act);
+    return card;
+  }
+
+  function download(item){
+    if(!item.blob) return;
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(item.blob);
+    a.download = item.outName || (baseName(item.name) + '_压缩');
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 800);
+  }
+
+  function removeItem(id){
+    var idx = items.findIndex(function(i){ return i.id === id; });
+    if(idx > -1){ URL.revokeObjectURL(items[idx].thumbUrl); items.splice(idx,1); }
+    if(!items.length){ els.emptyTip.style.display = 'block'; }
+    render(); scheduleSummary();
+  }
+
+  function updateButtons(){
+    var any = items.some(function(i){ return i.status === 'done'; });
+    els.downloadAllBtn.disabled = !any;
+  }
+
+  function scheduleSummary(){
+    clearTimeout(debTimer);
+    debTimer = setTimeout(renderSummary, 200);
+  }
+  function renderSummary(){
+    if(!items.length){
+      els.stats.innerHTML = '<div class="stat"><div class="k">已添加图片</div><div class="v">0</div></div>';
+      return;
+    }
+    var done = items.filter(function(i){ return i.status === 'done'; });
+    var orig = done.reduce(function(a,i){ return a+i.orig; },0);
+    var comp = done.reduce(function(a,i){ return a+i.size; },0);
+    var save = orig>0 ? Math.round((orig-comp)/orig*100) : 0;
+    var html =
+      '<div class="stat"><div class="k">图片数量</div><div class="v">'+items.length+'</div></div>' +
+      '<div class="stat"><div class="k">原始体积</div><div class="v">'+fmt(orig)+'</div></div>' +
+      '<div class="stat"><div class="k">压缩后</div><div class="v">'+fmt(comp)+'</div></div>' +
+      '<div class="stat"><div class="k">节省空间</div><div class="v'+(save>0?' ok':'')+'">'+save+'%</div></div>';
+    els.stats.innerHTML = html;
+  }
+
+  // 事件
+  els.drop.addEventListener('click', function(){ els.fileInput.click(); });
+  els.drop.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); els.fileInput.click(); } });
+  els.pickBtn.addEventListener('click', function(e){ e.stopPropagation(); els.fileInput.click(); });
+  els.fileInput.addEventListener('change', function(){ if(this.files.length) addFiles(this.files); this.value=''; });
+
+  ['dragenter','dragover'].forEach(function(ev){
+    document.addEventListener(ev, function(e){ e.preventDefault(); els.drop.classList.add('dragover'); });
+  });
+  ['dragleave','drop'].forEach(function(ev){
+    document.addEventListener(ev, function(e){ e.preventDefault(); els.drop.classList.remove('dragover'); });
+  });
+  document.addEventListener('drop', function(e){
+    if(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length){
+      addFiles(e.dataTransfer.files);
+    }
+  });
+
+  var reTimer = null;
+  function recompressAll(){
+    if(!items.length) return;
+    items.forEach(compress);
+    scheduleSummary();
+  }
+  function onSettings(){
+    els.qval.textContent = els.quality.value + '%';
+    clearTimeout(reTimer);
+    reTimer = setTimeout(recompressAll, 300);
+  }
+  els.quality.addEventListener('input', onSettings);
+  els.maxw.addEventListener('change', onSettings);
+  els.format.addEventListener('change', onSettings);
+
+  els.clearBtn.addEventListener('click', function(){
+    items.forEach(function(i){ URL.revokeObjectURL(i.thumbUrl); });
+    items = [];
+    els.emptyTip.style.display = 'block';
+    render(); renderSummary();
+  });
+  els.recompressBtn.addEventListener('click', recompressAll);
+  els.downloadAllBtn.addEventListener('click', function(){
+    items.filter(function(i){ return i.status==='done'; }).forEach(function(item, idx){
+      setTimeout(function(){ download(item); }, idx * 250);
+    });
+  });
+
+  renderSummary();
+})();
+</script>
+</body>
+</html>
